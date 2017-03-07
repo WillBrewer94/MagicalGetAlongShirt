@@ -15,34 +15,42 @@ public class Players : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-        Debug.Log(Input.GetAxis("Player1_X") + " " + Input.GetAxis("Player1_Y"));
-
         Vector3 player1Move = new Vector3(Input.GetAxis("Player1_Y"), 0, 0);
         Vector3 player1Rot = new Vector3(0, Input.GetAxis("Player1_X"), 0);
 
         Vector3 player2Move = new Vector3(Input.GetAxis("Player2_Y"), 0, 0);
         Vector3 player2Rot = new Vector3(0, Input.GetAxis("Player2_X"), 0);
 
-
         //Transforms
         transform.position = transform.position + camera1.transform.forward * player1Move.x * speed * Time.deltaTime;
         transform.position = transform.position + camera2.transform.forward * player2Move.x * speed * Time.deltaTime;
-        //transform.Translate(player1Move * Time.deltaTime * speed);
         transform.Rotate(player1Rot * Time.deltaTime * rotSpeed);
         transform.Rotate(player2Rot * Time.deltaTime * rotSpeed);
 
+        //Swing weapon
+        if(Input.GetKeyDown("space")) {
+            Swing();
+        }
+    }
 
+    //If spacebar is pressed, shoot ray from camera 1. If hit, destroy enemy
+    void Swing() {
+        RaycastHit hit;
 
+        if(Physics.Raycast(transform.position, camera1.transform.forward, out hit, 15)) {
+            if(hit.collider.isTrigger && hit.collider.tag == "Enemy") {
+                Destroy(hit.transform.gameObject);
+                Debug.Log("Hit");
+            }
+        }
+    }
 
+    private void OnTriggerEnter(Collider other) {
 
-        /*
-        Vector3 player1Move = new Vector3(Input.GetAxis("Player1_LeftX"), 0, Input.GetAxis("Player1_LeftY"));
-        Vector3 player1Rot = new Vector3(0, Input.GetAxis("Player1_RightX"), 0);
-
-        Vector3 player2Move = new Vector3(Input.GetAxis("Player2_LeftX"), 0, Input.GetAxis("Player2_LeftY"));
-        Vector3 player2Rot = new Vector3(0, Input.GetAxis("Player2_RightX"), 0);
-        */
-
+        //This code runs when enemy collides with player. Enemy is destroyed on collison
+        if(other.tag == "Enemy") {
+            Debug.Log("Enemy Hit");
+            Destroy(other.gameObject);
+        }
     }
 }
